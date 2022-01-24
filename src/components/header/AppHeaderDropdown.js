@@ -10,21 +10,69 @@ import {
   CDropdownMenu,
   CDropdownToggle,
 } from '@coreui/react'
-import {
-  cilBell,
-  cilCommentSquare,
-  cilEnvelopeOpen,
-  cilLockLocked,
-  cilSettings,
-  cilTask,
-  cilUser,
-} from '@coreui/icons'
+import { cilLockLocked, cilSettings, cilUser } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import UserLogo from 'src/assets/images/icon/user.svg'
 import NotificationLogo from 'src/assets/images/icon/notification.svg'
 
+import axios from 'axios'
+import sweetalert2 from 'src/components/custom/Sweetalert2'
+
+const notification_map = {
+  new_hotleads_non_ro: {
+    label: 'Leads Baru',
+    link: '/#/new_hot_leads',
+  },
+  prospect: { label: 'Hot Prospects', link: '/#/order_management' },
+  customer_non_ro: {
+    label: 'Leads Manual',
+    link: '/#/customer_non_ro',
+  },
+  new_hotleads: {
+    label: 'Leads to be convert',
+    link: '/#/customer_non_ro_convert',
+  },
+}
+
 const AppHeaderDropdown = () => {
   const user_data = useSelector((state) => state.user_data)
+
+  const variables = useSelector((state) => state.variables)
+  const access_token = useSelector((state) => state.access_token)
+
+  const [notifications, setNotifications] = React.useState([])
+
+  const getNotification = React.useCallback(() => {
+    axios({
+      method: 'get',
+      baseURL: variables.api_base_url,
+      url: 'api/cms/notification-number',
+      headers: {
+        Authorization: access_token,
+      },
+      params: {
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1,
+      },
+    }).then(
+      (result) => {
+        const { data } = result
+
+        setNotifications(data.data)
+      },
+      (e) => {
+        sweetalert2.fire({
+          text: e.message || e.status,
+          icon: 'error',
+        })
+      },
+    )
+  }, [access_token, variables])
+
+  React.useEffect(() => {
+    getNotification()
+    console.log('NOTIFICATION MAP', notification_map)
+  }, [getNotification])
 
   return (
     <>
@@ -34,34 +82,18 @@ const AppHeaderDropdown = () => {
         </CDropdownToggle>
         <CDropdownMenu className="pt-0" placement="bottom-end">
           <CDropdownHeader className="bg-light fw-semibold py-2">Notification</CDropdownHeader>
-          <CDropdownItem href="#">
-            <CIcon icon={cilBell} className="me-2" />
-            Updates
-            <CBadge color="info" className="ms-2">
-              42
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem href="#">
-            <CIcon icon={cilEnvelopeOpen} className="me-2" />
-            Messages
-            <CBadge color="success" className="ms-2">
-              42
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem href="#">
-            <CIcon icon={cilTask} className="me-2" />
-            Tasks
-            <CBadge color="danger" className="ms-2">
-              42
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem href="#">
-            <CIcon icon={cilCommentSquare} className="me-2" />
-            Comments
-            <CBadge color="warning" className="ms-2">
-              42
-            </CBadge>
-          </CDropdownItem>
+          {notifications.map((notification, idx) => (
+            <CDropdownItem key={idx} href={notification_map[notification.module]?.link}>
+              <span>{notification_map[notification.module]?.label}</span>
+              {notification.count_data > 0 ? (
+                <CBadge color="info" className="ms-2 text-right">
+                  {notification.count_data}
+                </CBadge>
+              ) : (
+                ''
+              )}
+            </CDropdownItem>
+          ))}
         </CDropdownMenu>
       </CDropdown>
 
