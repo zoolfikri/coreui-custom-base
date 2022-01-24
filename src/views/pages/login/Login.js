@@ -41,7 +41,7 @@ const Login = ({ history }) => {
           dispatch({ type: 'set', user_data: data.data }),
           dispatch({ type: 'set', access_token: data.access_token }),
         ]).then(() => {
-          history.push('/dashboard')
+          history.push('/home')
         })
       },
       (e) => {
@@ -57,13 +57,9 @@ const Login = ({ history }) => {
 
   React.useEffect(() => {
     if (user_data && access_token) {
-      history.push('/dashboard')
+      history.push('/home')
     }
-  })
-
-  // if (user_data && access_token) {
-  //   return <Redirect to="/dashboard" />
-  // }
+  }, [access_token, user_data, history])
 
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
