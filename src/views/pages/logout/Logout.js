@@ -1,38 +1,52 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 
 import sweetalert2 from 'src/components/custom/Sweetalert2'
+import queryString from 'query-string'
 
 const Logout = ({ history }) => {
   const dispatch = useDispatch()
+  const { search } = useLocation()
+  const querystring = queryString.parse(search)
 
   React.useEffect(() => {
     if (localStorage.getItem('user_data') && localStorage.getItem('access_token')) {
-      sweetalert2
-        .fire({
-          title: 'Keluar dari Web Console?',
-          showDenyButton: true,
-          confirmButtonText: 'Ya, Keluar',
-          denyButtonText: `Tidak, Kembali`,
+      if (querystring.force) {
+        Promise.all([
+          localStorage.removeItem('user_data'),
+          localStorage.removeItem('access_token'),
+          dispatch({ type: 'set', user_data: null }),
+          dispatch({ type: 'set', access_token: null }),
+        ]).then(() => {
+          history.push('/login')
         })
-        .then((result) => {
-          if (result.isConfirmed) {
-            Promise.all([
-              localStorage.removeItem('user_data'),
-              localStorage.removeItem('access_token'),
-              dispatch({ type: 'set', user_data: null }),
-              dispatch({ type: 'set', access_token: null }),
-            ]).then(() => {
-              console.log('LOGOUT')
-              history.push('/login')
-            })
-          } else if (result.isDenied) {
-            history.goBack()
-          } else {
-            history.goBack()
-          }
-        })
+      } else {
+        sweetalert2
+          .fire({
+            title: 'Keluar dari Web Console?',
+            showDenyButton: true,
+            confirmButtonText: 'Ya, Keluar',
+            denyButtonText: `Tidak, Kembali`,
+          })
+          .then((result) => {
+            if (result.isConfirmed) {
+              Promise.all([
+                localStorage.removeItem('user_data'),
+                localStorage.removeItem('access_token'),
+                dispatch({ type: 'set', user_data: null }),
+                dispatch({ type: 'set', access_token: null }),
+              ]).then(() => {
+                history.push('/login')
+              })
+            } else if (result.isDenied) {
+              history.goBack()
+            } else {
+              history.goBack()
+            }
+          })
+      }
     } else {
       console.log('LOGOUT')
       history.push('/login')
