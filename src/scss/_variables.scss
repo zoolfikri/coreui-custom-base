@@ -1589,7 +1589,7 @@ $nav-link-font-size:                    0.75rem;
 
 // Breadcrumbs
 // scss-docs-start breadcrumb-variables
-// $breadcrumb-font-size:              null !default;
+$breadcrumb-font-size:                  .875rem;
 // $breadcrumb-padding-y:              0 !default;
 // $breadcrumb-padding-x:              0 !default;
 // $breadcrumb-item-padding-x:         .5rem !default;
@@ -1597,7 +1597,7 @@ $nav-link-font-size:                    0.75rem;
 // $breadcrumb-bg:                     unset !default;
 // $breadcrumb-divider-color:          $gray-600 !default;
 // $breadcrumb-active-color:           $gray-600 !default;
-// $breadcrumb-divider:                quote("/") !default;
+$breadcrumb-divider:                    quote(">") !default;
 // $breadcrumb-divider-flipped:        $breadcrumb-divider !default;
 // $breadcrumb-border-radius:          null !default;
 // scss-docs-end breadcrumb-variables
