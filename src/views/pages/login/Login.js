@@ -41,7 +41,7 @@ const Login = ({ history }) => {
           dispatch({ type: 'set', user_data: data.data }),
           dispatch({ type: 'set', access_token: data.access_token }),
         ]).then(() => {
-          history.push('/home')
+          history.push('/welcome')
         })
       },
       (e) => {
@@ -57,7 +57,7 @@ const Login = ({ history }) => {
 
   React.useEffect(() => {
     if (user_data && access_token) {
-      history.push('/home')
+      history.push('/welcome')
     }
   }, [access_token, user_data, history])
 

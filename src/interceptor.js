@@ -1,9 +1,12 @@
 import axios from 'axios'
+import sweetalert2 from 'src/components/custom/Sweetalert2'
 
 const error_codes = [
   { code: 105, message: 'Email tidak terdaftar' },
   { code: 106, message: 'Email dan kata sandi tidak sesuai' },
 ]
+
+let swalSession = sweetalert2
 
 // Add a request interceptor
 axios.interceptors.request.use(
@@ -23,7 +26,23 @@ axios.interceptors.response.use(
     const { data } = response
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
+    // 1996 = Session expired
+    if (parseInt(data.code) === 1996) {
+      if (!swalSession.isVisible()) {
+        swalSession.fire({
+          text: 'Sesi telah berakhir, silakan login kembali',
+          icon: 'error',
+        })
+        window.location.href = '/#/logout?force=true'
+      }
 
+      // Promise.all([
+      //   localStorage.removeItem('user_data'),
+      //   localStorage.removeItem('access_token'),
+      // ]).then(() => {
+      //   // window.location.href = '/#/login'
+      // })
+    }
     // Check if any error codes found
     const error = error_codes.filter((o) => o.code === parseInt(data.code))
     if (error.length) {
