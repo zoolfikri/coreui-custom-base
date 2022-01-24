@@ -1,0 +1,33 @@
+// Here you can add other styles
+.input-group-icon {
+  position: relative;
+  > .icon {
+    position: absolute;
+    z-index: 9;
+    top: 50%;
+    transform: translate(0, -50%);
+    font-size: $input-btn-font-size;
+  }
+  > .icon:not(:first-child) {
+    right: $input-padding-x;
+  }
+  > .icon:not(:last-child) {
+    left: $input-padding-x;
+  }
+  .form-control:not(:first-child) {
+    padding-left: calc(calc($input-padding-x * 2) + $input-btn-font-size);
+  }
+  .form-control:not(:last-child) {
+    padding-right: calc(calc($input-padding-x * 2) + $input-btn-font-size);
+  }
+}
+
+.text-title {
+  font-size: $font-size-lg !important;
+  line-height: $line-height-lg !important;
+}
+
+.text-body {
+  font-size: $font-size-base !important;
+  line-height: $line-height-base !important;
+}
