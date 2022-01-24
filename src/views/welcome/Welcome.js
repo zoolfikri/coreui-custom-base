@@ -3,19 +3,19 @@ import { useSelector } from 'react-redux'
 
 import HomeBG from 'src/assets/images/home/bg.png'
 import HomeBot from 'src/assets/images/home/bot.png'
-import './Home.scss'
+import './Welcome.scss'
 
 const bot_name = ['', 'Wanda', 'Dara', 'Melisha', 'Amanda']
 
-const Home = () => {
+const Welcome = () => {
   const variables = useSelector((state) => state.variables)
   const user_data = useSelector((state) => state.user_data)
 
   return (
     <>
       <div className="home-page">
-        <img src={HomeBG} className="home-bg" alt="Home Background" />
-        <img src={HomeBot} className="home-bot" alt="Home Bot" />
+        <img src={HomeBG} className="home-bg" alt="Welcome Background" />
+        <img src={HomeBot} className="home-bot" alt="Welcome Bot" />
 
         <div className="talk-bubble">
           <div className="talktext">
@@ -35,4 +35,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default Welcome
