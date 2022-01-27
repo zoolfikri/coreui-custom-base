@@ -22,6 +22,15 @@
   }
 }
 
+.breadcrumb {
+  .breadcrumb-item {
+    &::before {
+      font-family: "Font Awesome 5 Free" !important;
+      font-weight: 900;
+    }
+  }
+}
+
 .text-title {
   font-size: $font-size-lg !important;
   line-height: $line-height-lg !important;

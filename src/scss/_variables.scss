@@ -1597,7 +1597,7 @@ $breadcrumb-font-size:                  .875rem;
 // $breadcrumb-bg:                     unset !default;
 // $breadcrumb-divider-color:          $gray-600 !default;
 // $breadcrumb-active-color:           $gray-600 !default;
-$breadcrumb-divider:                    quote(">") !default;
+$breadcrumb-divider:                    "\f054";
 // $breadcrumb-divider-flipped:        $breadcrumb-divider !default;
 // $breadcrumb-border-radius:          null !default;
 // scss-docs-end breadcrumb-variables
