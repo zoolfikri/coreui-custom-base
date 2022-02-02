@@ -23,7 +23,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Leads to Convert',
-        to: '/base/accordion',
+        to: '/testable',
       },
       {
         component: CNavItem,

@@ -20,6 +20,7 @@ const Logout = ({ history }) => {
           dispatch({ type: 'set', user_data: null }),
           dispatch({ type: 'set', access_token: null }),
         ]).then(() => {
+          console.log('Force Logout')
           history.push('/login')
         })
       } else {
@@ -38,6 +39,7 @@ const Logout = ({ history }) => {
                 dispatch({ type: 'set', user_data: null }),
                 dispatch({ type: 'set', access_token: null }),
               ]).then(() => {
+                console.log('Manual Logout')
                 history.push('/login')
               })
             } else if (result.isDenied) {
@@ -48,7 +50,6 @@ const Logout = ({ history }) => {
           })
       }
     } else {
-      console.log('LOGOUT')
       history.push('/login')
     }
   })

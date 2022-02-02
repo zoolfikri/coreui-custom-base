@@ -71,18 +71,18 @@ const AppHeaderDropdown = () => {
 
   React.useEffect(() => {
     getNotification()
-    console.log('NOTIFICATION MAP', notification_map)
+    // console.log('NOTIFICATION MAP', notification_map)
   }, [getNotification])
 
   return (
     <>
       <CDropdown variant="nav-item">
         <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
-          <CAvatar src={NotificationLogo} size="md" />
+          <CAvatar src={NotificationLogo} size="md" alt="notification-bell" />
         </CDropdownToggle>
         <CDropdownMenu className="pt-0" placement="bottom-end">
           <CDropdownHeader className="bg-light fw-semibold py-2">Notification</CDropdownHeader>
-          {notifications.map((notification, idx) => (
+          {notifications?.map((notification, idx) => (
             <CDropdownItem key={idx} href={notification_map[notification.module]?.link}>
               <span>{notification_map[notification.module]?.label}</span>
               {notification.count_data > 0 ? (
@@ -100,7 +100,7 @@ const AppHeaderDropdown = () => {
       <CDropdown variant="nav-item">
         <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
           <div className="d-flex align-items-center">
-            <CAvatar src={UserLogo} size="md" />
+            <CAvatar src={UserLogo} size="md" alt="user-avatar" />
             <div className="ps-3">
               <div className="text-title fw-bold text-primary mb-1">{user_data.username}</div>
               <div className="text-body text-primary">{user_data.role}</div>

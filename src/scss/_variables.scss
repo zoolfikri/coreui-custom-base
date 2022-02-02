@@ -130,7 +130,7 @@ $primary:       $deep-saphire !default;
 $info:          $azure !default;
 $warning:       $yellow-orange !default;
 $danger:        $fire-red !default;
-// $light:         $light-base !default;
+$light:         $aqua-haze !default;
 // $dark:          $dark-base !default;
 // scss-docs-end theme-color-variables
 
@@ -610,8 +610,8 @@ $h3-font-size:                    24px;
 // Customizes the `.table` component with basic values, each used across all table variations.
 
 // scss-docs-start table-variables
-// $table-cell-padding-y:        .5rem !default;
-// $table-cell-padding-x:        .5rem !default;
+$table-cell-padding-y:        1rem;
+$table-cell-padding-x:        .625rem;
 // $table-cell-padding-y-sm:     .25rem !default;
 // $table-cell-padding-x-sm:     .25rem !default;
 
@@ -620,7 +620,7 @@ $h3-font-size:                    24px;
 // $table-color:                 $body-color !default;
 // $table-bg:                    transparent !default;
 
-// $table-th-font-weight:        600 !default;
+$table-th-font-weight:        bold;
 
 // $table-striped-color:         $table-color !default;
 // $table-striped-bg-factor:     .05 !default;

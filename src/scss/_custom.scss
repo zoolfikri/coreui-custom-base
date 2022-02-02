@@ -31,6 +31,36 @@
   }
 }
 
+.table-general {
+  thead {
+    tr {
+      th {
+        background-color: transparent !important;
+        color: $deep-saphire !important;
+      }
+    }
+  }
+  tbody {
+    tr {
+      td {
+        background-color: #ffffff !important;
+        color: $deep-saphire !important;
+      }
+    }
+  }
+}
+
+.pagination-general {
+  > button {
+    color: $deep-saphire;
+    &.active {
+      color: #fff;
+      background-color: $deep-saphire;
+      border-radius: 32px;
+    }
+  }
+}
+
 .text-title {
   font-size: $font-size-lg !important;
   line-height: $line-height-lg !important;
@@ -39,4 +69,8 @@
 .text-body {
   font-size: $font-size-base !important;
   line-height: $line-height-base !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
