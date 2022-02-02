@@ -85,11 +85,11 @@ function Testable() {
             const { data } = result.data
             // const startRow = pageSize * pageIndex
             // const endRow = startRow + pageSize
-            setData(data.data)
+            setData(data?.data)
 
             // Your server could send back total page count.
             // For now we'll just fake it, too
-            setPageCount(data.last_page)
+            setPageCount(data?.last_page)
 
             setLoading(false)
           }
@@ -110,6 +110,8 @@ function Testable() {
         fetchData={fetchData}
         loading={loading}
         pageCount={pageCount}
+        selectableRow
+        getSelectedRows={(rows) => console.log('GET ROWS', rows)}
       />
     </div>
   )

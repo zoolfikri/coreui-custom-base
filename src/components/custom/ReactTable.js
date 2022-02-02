@@ -1,7 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useTable, usePagination, useFilters, useGlobalFilter, useAsyncDebounce } from 'react-table'
+import {
+  useTable,
+  usePagination,
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useAsyncDebounce,
+} from 'react-table'
 import { CDropdown, CDropdownMenu } from '@coreui/react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -11,6 +18,119 @@ import {
   faChevronRight,
   faSearch,
 } from '@fortawesome/free-solid-svg-icons'
+
+function deepCompare() {
+  var i, l, leftChain, rightChain
+
+  function compare2Objects(x, y) {
+    var p
+
+    // remember that NaN === NaN returns false
+    // and isNaN(undefined) returns true
+    if (isNaN(x) && isNaN(y) && typeof x === 'number' && typeof y === 'number') {
+      return true
+    }
+
+    // Compare primitives and functions.
+    // Check if both arguments link to the same object.
+    // Especially useful on the step where we compare prototypes
+    if (x === y) {
+      return true
+    }
+
+    // Works in case when functions are created in constructor.
+    // Comparing dates is a common scenario. Another built-ins?
+    // We can even handle functions passed across iframes
+    if (
+      (typeof x === 'function' && typeof y === 'function') ||
+      (x instanceof Date && y instanceof Date) ||
+      (x instanceof RegExp && y instanceof RegExp) ||
+      (x instanceof String && y instanceof String) ||
+      (x instanceof Number && y instanceof Number)
+    ) {
+      return x.toString() === y.toString()
+    }
+
+    // At last checking prototypes as good as we can
+    if (!(x instanceof Object && y instanceof Object)) {
+      return false
+    }
+
+    if (x.isPrototypeOf(y) || y.isPrototypeOf(x)) {
+      return false
+    }
+
+    if (x.constructor !== y.constructor) {
+      return false
+    }
+
+    if (x.prototype !== y.prototype) {
+      return false
+    }
+
+    // Check for infinitive linking loops
+    if (leftChain.indexOf(x) > -1 || rightChain.indexOf(y) > -1) {
+      return false
+    }
+
+    // Quick checking of one object being a subset of another.
+    // todo: cache the structure of arguments[0] for performance
+    for (p in y) {
+      if (y.hasOwnProperty(p) !== x.hasOwnProperty(p)) {
+        return false
+      } else if (typeof y[p] !== typeof x[p]) {
+        return false
+      }
+    }
+
+    for (p in x) {
+      if (y.hasOwnProperty(p) !== x.hasOwnProperty(p)) {
+        return false
+      } else if (typeof y[p] !== typeof x[p]) {
+        return false
+      }
+
+      switch (typeof x[p]) {
+        case 'object':
+        case 'function':
+          leftChain.push(x)
+          rightChain.push(y)
+
+          if (!compare2Objects(x[p], y[p])) {
+            return false
+          }
+
+          leftChain.pop()
+          rightChain.pop()
+          break
+
+        default:
+          if (x[p] !== y[p]) {
+            return false
+          }
+          break
+      }
+    }
+
+    return true
+  }
+
+  if (arguments.length < 1) {
+    return true //Die silently? Don't know how to handle such case, please help...
+    // throw "Need two or more arguments to compare";
+  }
+
+  for (i = 1, l = arguments.length; i < l; i++) {
+    leftChain = [] //Todo: this can be cached
+    rightChain = []
+
+    if (!compare2Objects(arguments[0], arguments[i])) {
+      return false
+    }
+  }
+
+  return true
+}
 
 function GlobalFilter({ globalFilter, setGlobalFilter }) {
   const [value, setValue] = React.useState(globalFilter)
@@ -40,10 +160,42 @@ GlobalFilter.propTypes = {
   setGlobalFilter: PropTypes.func,
 }
 
+const IndeterminateCheckbox = React.forwardRef(({ indeterminate, ...rest }, ref) => {
+  const defaultRef = React.useRef()
+  const resolvedRef = ref || defaultRef
+
+  React.useEffect(() => {
+    resolvedRef.current.indeterminate = indeterminate
+  }, [resolvedRef, indeterminate])
+
+  return (
+    <>
+      <input type="checkbox" ref={resolvedRef} {...rest} />
+    </>
+  )
+})
+
+IndeterminateCheckbox.displayName = 'IndeterminateCheckbox'
+IndeterminateCheckbox.propTypes = {
+  indeterminate: PropTypes.any,
+  getToggleAllPageRowsSelectedProps: PropTypes.any,
+  row: PropTypes.shape({
+    getToggleRowSelectedProps: PropTypes.func,
+  }),
+}
+
 // Let's add a fetchData method to our Table component that will be used to fetch
 // new data when pagination state changes
 // We can also add a loading state to let our table know it's loading new data
-function Table({ columns, data, fetchData, loading, pageCount: controlledPageCount }) {
+function Table({
+  columns,
+  data,
+  fetchData,
+  loading,
+  pageCount: controlledPageCount,
+  selectableRow = false,
+  getSelectedRows,
+}) {
   const {
     getTableProps,
     getTableBodyProps,
@@ -61,8 +213,9 @@ function Table({ columns, data, fetchData, loading, pageCount: controlledPageCou
     preGlobalFilteredRows,
     setGlobalFilter,
     setAllFilters,
+    selectedFlatRows,
     // Get the state from the instance
-    state: { pageIndex, pageSize, globalFilter, filters },
+    state: { pageIndex, pageSize, globalFilter, filters, selectedRowIds },
   } = useTable(
     {
       columns,
@@ -77,14 +230,44 @@ function Table({ columns, data, fetchData, loading, pageCount: controlledPageCou
       pageCount: controlledPageCount,
       autoResetFilters: false, // Control filter manualy
       autoResetGlobalFilter: false, // Control filter manualy
+      autoResetSelectedRows: false, // Control selected rows manualy
+      getRowId: (row) => row.id,
     },
     useFilters, // useFilters!
     useGlobalFilter, // useGlobalFilter!
     usePagination,
+    useRowSelect,
+    (hooks) => {
+      if (!selectableRow) {
+        return false
+      }
+      hooks.visibleColumns.push((columns) => [
+        // Let's make a column for selection
+        {
+          id: 'selection',
+          // The header can use the table's getToggleAllRowsSelectedProps method
+          // to render a checkbox
+          Header: ({ getToggleAllPageRowsSelectedProps }) => (
+            <div>
+              <IndeterminateCheckbox {...getToggleAllPageRowsSelectedProps()} />
+            </div>
+          ),
+          // The cell can use the individual row's getToggleRowSelectedProps method
+          // to the render a checkbox
+          Cell: ({ row }) => (
+            <div>
+              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+            </div>
+          ),
+        },
+        ...columns,
+      ])
+    },
   )
 
   const [showFilterDropdown, setShowFilterDropdown] = React.useState(false)
   const [filterPerColumn, setFilterPerColumn] = React.useState({})
+  const [tempSelectedRows, setTempSelectedRows] = React.useState({})
 
   // Debounce our onFetchData call for 100ms
   const onFetchDataDebounced = useAsyncDebounce(fetchData, 100)
@@ -101,6 +284,40 @@ function Table({ columns, data, fetchData, loading, pageCount: controlledPageCou
       setAllFilters((filtersObjectArray) => [])
     }
   }, [globalFilter, setAllFilters])
+
+  // Listen for selected rows
+  React.useEffect(() => {
+    console.log('selectedRowIds', selectedRowIds)
+    console.log('selectedFlatRows', selectedFlatRows)
+    console.log('tempSelectedRows', tempSelectedRows)
+    if (deepCompare(Object.keys(tempSelectedRows), Object.keys(selectedRowIds))) {
+      console.log('DEEP COMPARE TRUE')
+    } else {
+      console.log('DEEP COMPARE FALSE')
+      let temp = {}
+      Object.keys(selectedRowIds).map((key) => {
+        if (tempSelectedRows[key]) {
+          temp[key] = tempSelectedRows[key]
+        } else {
+          const sfr_idx = selectedFlatRows.findIndex((o) => String(o.id) === String(key))
+          if (sfr_idx > -1) {
+            temp[key] = selectedFlatRows[sfr_idx].original
+          }
+        }
+        return true
+      })
+      setTempSelectedRows(temp)
+    }
+  }, [selectedRowIds, tempSelectedRows, selectedFlatRows])
+
+  React.useEffect(() => {
+    console.log('!!! HOOK getSelectedRows')
+    if (getSelectedRows) {
+      const returnedRows = []
+      Object.keys(tempSelectedRows).map((key) => returnedRows.push(tempSelectedRows[key]))
+      getSelectedRows(returnedRows)
+    }
+  }, [getSelectedRows, tempSelectedRows])
 
   const pageItemCount = 3
 
@@ -349,6 +566,10 @@ Table.propTypes = {
   fetchData: PropTypes.func,
   loading: PropTypes.bool,
   pageCount: PropTypes.number,
+  selectableRow: PropTypes.bool,
+  getSelectedRows: PropTypes.func,
+  getToggleAllPageRowsSelectedProps: PropTypes.any,
+  row: PropTypes.any,
 }
 
 export default Table
