@@ -195,6 +195,7 @@ function Table({
   pageCount: controlledPageCount,
   selectableRow = false,
   getSelectedRows,
+  rowId,
 }) {
   const {
     getTableProps,
@@ -231,7 +232,7 @@ function Table({
       autoResetFilters: false, // Control filter manualy
       autoResetGlobalFilter: false, // Control filter manualy
       autoResetSelectedRows: false, // Control selected rows manualy
-      getRowId: (row) => row.id,
+      getRowId: (row) => row[rowId ? rowId : 'id'],
     },
     useFilters, // useFilters!
     useGlobalFilter, // useGlobalFilter!
@@ -445,13 +446,18 @@ function Table({
       <div className="row g-3 justify-content-md-center align-items-center">
         <div className="col-auto">
           <div className="pagination-general">
-            <button className="btn" onClick={() => previousPage()} disabled={!canPreviousPage}>
+            <button
+              className="btn"
+              onClick={() => previousPage()}
+              disabled={!canPreviousPage || loading}
+            >
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
             <button
               className={`btn ${pageIndex === 0 ? 'active' : ''}`}
               onClick={() => gotoPage(0)}
               // disabled={!canPreviousPage}
+              disabled={loading}
             >
               1
             </button>
@@ -464,7 +470,7 @@ function Table({
                     key={i}
                     className={`btn ${this_pageIndex === pageIndex ? 'active' : ''}`}
                     onClick={() => gotoPage(this_pageIndex)}
-                    disabled={this_pageIndex < 1}
+                    disabled={this_pageIndex < 1 || loading}
                   >
                     {this_pageIndex + 1}
                   </button>
@@ -482,7 +488,7 @@ function Table({
                     key={i}
                     className={`btn ${this_pageIndex === pageIndex ? 'active' : ''}`}
                     onClick={() => gotoPage(this_pageIndex)}
-                    disabled={this_pageIndex > pageCount - 1}
+                    disabled={this_pageIndex > pageCount - 1 || loading}
                   >
                     {this_pageIndex + 1}
                   </button>
@@ -497,13 +503,14 @@ function Table({
                 className={`btn ${pageIndex === pageCount - 1 ? 'active' : ''}`}
                 onClick={() => gotoPage(pageCount - 1)}
                 // disabled={!canNextPage}
+                disabled={loading}
               >
                 {pageCount}
               </button>
             ) : (
               ''
             )}
-            <button className="btn" onClick={() => nextPage()} disabled={!canNextPage}>
+            <button className="btn" onClick={() => nextPage()} disabled={!canNextPage || loading}>
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
           </div>
@@ -540,6 +547,7 @@ function Table({
                 onChange={(e) => {
                   setPageSize(Number(e.target.value))
                 }}
+                disabled={loading}
               >
                 {[10, 20, 30, 40, 50].map((pageSize) => (
                   <option key={pageSize} value={pageSize}>
@@ -570,6 +578,7 @@ Table.propTypes = {
   getSelectedRows: PropTypes.func,
   getToggleAllPageRowsSelectedProps: PropTypes.any,
   row: PropTypes.any,
+  rowId: PropTypes.string,
 }
 
 export default Table

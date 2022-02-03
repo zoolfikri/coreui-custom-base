@@ -85,7 +85,7 @@ function Testable() {
             const { data } = result.data
             // const startRow = pageSize * pageIndex
             // const endRow = startRow + pageSize
-            setData(data?.data)
+            setData(data?.data ? data.data : [])
 
             // Your server could send back total page count.
             // For now we'll just fake it, too
