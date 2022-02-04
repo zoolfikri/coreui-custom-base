@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { HashRouter, Route, Switch, Redirect } from 'react-router-dom'
 import './scss/style.scss'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const loading = (
   <div className="pt-3 text-center">
