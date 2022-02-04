@@ -79,3 +79,25 @@
 .cursor-pointer {
   cursor: pointer;
 }
+
+// Dashboard
+.dashboard {
+  .leads-assigned-status {
+    .name {
+      font-size: 10px;
+      line-height: 14px;
+      color: #979797;
+    }
+
+    .percentage {
+      font-size: 14px;
+      line-height: 19px;
+    }
+
+    .total {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 25px;
+    }
+  }
+}

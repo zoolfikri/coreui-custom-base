@@ -6,6 +6,7 @@ const LeadsUnassigned = lazy(() => import('./LeadsUnassigned'))
 const HotProspects = lazy(() => import('./HotProspects'))
 const NewLeadsToConvert = lazy(() => import('./NewLeadsToConvert'))
 const ClockTick = lazy(() => import('src/components/custom/ClockTick'))
+const LeadsAssignedStatus = lazy(() => import('./LeadsAssignedStatus'))
 
 const month_options = [
   { id: 1, name: 'Januari' },
@@ -32,8 +33,8 @@ const Dashboard = () => {
   const [filter_year, setFilter_year] = React.useState(new Date().getFullYear())
 
   return (
-    <>
-      <div className="row row-cols-1 row-cols-md-3 row-cols-lg-3 row-cols-xl-6 g-3">
+    <div className="dashboard">
+      <div className="row row-cols-1 row-cols-md-3 row-cols-lg-3 row-cols-xl-6 g-3 mb-3">
         <div className="col">
           <SisaKuota />
         </div>
@@ -50,7 +51,7 @@ const Dashboard = () => {
           <NewLeadsToConvert filter={{ month: filter_month, year: filter_year }} />
         </div>
         <div className="col">
-          <ClockTick className="d-block mb-2" />
+          <ClockTick className="d-block mb-2 text-title" />
           <form className="row g-2">
             <div className="col-7">
               <select
@@ -81,7 +82,20 @@ const Dashboard = () => {
           </form>
         </div>
       </div>
-    </>
+
+      <div className="row row-cols-1 row-cols-lg-2 g-3">
+        <div className="col"></div>
+        <div className="col">
+          <div className="row row-cols-1 row-cols-lg-3 g-3">
+            <div className="col">
+              <LeadsAssignedStatus filter={{ month: filter_month, year: filter_year }} />
+            </div>
+            <div className="col"></div>
+            <div className="col"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
