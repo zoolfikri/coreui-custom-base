@@ -49,15 +49,44 @@ const LeadsAssignedStatus = ({ filter }) => {
   if (loading) {
     return (
       <>
-        <div className="card">
+        <div className="card leads-assigned-status">
           <div className="card-body d-flex flex-column">
             <div className="fw-semibold text-primary mb-2">
               <Skeleton />
             </div>
-            <div className="d-flex justify-content-between align-items-end mt-auto">
-              <span className="h2 fw-semibold mb-0">
-                <Skeleton width={100} />
-              </span>
+            <div className="d-flex flex-column align-content-between">
+              {/* Leads Assigned */}
+              <div className="py-1" style={{ borderBottom: '1px solid #EFF2F6' }}>
+                <div className="name">
+                  <Skeleton />
+                </div>
+                <div className="d-flex justify-content-between">
+                  <Skeleton className="percentage" width={50} />
+                  <Skeleton className="total" width={50} />
+                </div>
+              </div>
+
+              {/* Hot Prospect */}
+              <div className="py-1" style={{ borderBottom: '1px solid #EFF2F6' }}>
+                <div className="name">
+                  <Skeleton />
+                </div>
+                <div className="d-flex justify-content-between">
+                  <Skeleton className="percentage" width={50} />
+                  <Skeleton className="total" width={50} />
+                </div>
+              </div>
+
+              {/* Resolved */}
+              <div className="py-1">
+                <div className="name">
+                  <Skeleton />
+                </div>
+                <div className="d-flex justify-content-between">
+                  <Skeleton className="percentage" width={50} />
+                  <Skeleton className="total" width={50} />
+                </div>
+              </div>
             </div>
           </div>
         </div>
