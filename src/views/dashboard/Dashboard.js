@@ -1,5 +1,6 @@
 import React, { lazy } from 'react'
 
+const Visible = lazy(() => import('src/components/custom/Visible'))
 const SisaKuota = lazy(() => import('./SisaKuota'))
 const NewLeadsPerMonth = lazy(() => import('./NewLeadsPerMonth'))
 const LeadsUnassigned = lazy(() => import('./LeadsUnassigned'))
@@ -36,19 +37,29 @@ const Dashboard = () => {
     <div className="dashboard">
       <div className="row row-cols-1 row-cols-md-3 row-cols-lg-3 row-cols-xl-6 g-3 mb-3">
         <div className="col">
-          <SisaKuota />
+          <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
+            <SisaKuota />
+          </Visible>
         </div>
         <div className="col">
-          <NewLeadsPerMonth filter={{ month: filter_month, year: filter_year }} />
+          <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
+            <NewLeadsPerMonth filter={{ month: filter_month, year: filter_year }} />
+          </Visible>
         </div>
         <div className="col">
-          <LeadsUnassigned filter={{ month: filter_month, year: filter_year }} />
+          <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
+            <LeadsUnassigned filter={{ month: filter_month, year: filter_year }} />
+          </Visible>
         </div>
         <div className="col">
-          <HotProspects filter={{ month: filter_month, year: filter_year }} />
+          <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
+            <HotProspects filter={{ month: filter_month, year: filter_year }} />
+          </Visible>
         </div>
         <div className="col">
-          <NewLeadsToConvert filter={{ month: filter_month, year: filter_year }} />
+          <Visible when={(user) => ['MD'].includes(user.role)}>
+            <NewLeadsToConvert filter={{ month: filter_month, year: filter_year }} />
+          </Visible>
         </div>
         <div className="col">
           <ClockTick className="d-block mb-2 text-title" />
@@ -88,7 +99,9 @@ const Dashboard = () => {
         <div className="col">
           <div className="row row-cols-1 row-cols-lg-3 g-3">
             <div className="col">
-              <LeadsAssignedStatus filter={{ month: filter_month, year: filter_year }} />
+              <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
+                <LeadsAssignedStatus filter={{ month: filter_month, year: filter_year }} />
+              </Visible>
             </div>
             <div className="col"></div>
             <div className="col"></div>
