@@ -8,6 +8,7 @@ const HotProspects = lazy(() => import('./HotProspects'))
 const NewLeadsToConvert = lazy(() => import('./NewLeadsToConvert'))
 const ClockTick = lazy(() => import('src/components/custom/ClockTick'))
 const LeadsAssignedStatus = lazy(() => import('./LeadsAssignedStatus'))
+const ResolvedStatus = lazy(() => import('./ResolvedStatus'))
 
 const month_options = [
   { id: 1, name: 'Januari' },
@@ -103,7 +104,11 @@ const Dashboard = () => {
                 <LeadsAssignedStatus filter={{ month: filter_month, year: filter_year }} />
               </Visible>
             </div>
-            <div className="col"></div>
+            <div className="col">
+              <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
+                <ResolvedStatus filter={{ month: filter_month, year: filter_year }} />
+              </Visible>
+            </div>
             <div className="col"></div>
           </div>
         </div>

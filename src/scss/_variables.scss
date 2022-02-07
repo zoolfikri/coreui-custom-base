@@ -124,13 +124,13 @@ $yellow-orange:   #F7B500 !default;
 // fusv-enable
 
 // scss-docs-start theme-color-variables
-$primary:       $deep-saphire !default;
-// $secondary:     $secondary-base !default;
+$primary:       $deep-saphire;
+$secondary:     $mercury;
 // $success:       $success-base !default;
-$info:          $azure !default;
-$warning:       $yellow-orange !default;
-$danger:        $fire-red !default;
-$light:         $aqua-haze !default;
+$info:          $azure;
+$warning:       $yellow-orange;
+$danger:        $fire-red;
+$light:         $aqua-haze;
 // $dark:          $dark-base !default;
 // scss-docs-end theme-color-variables
 
@@ -505,7 +505,7 @@ $font-size-lg:                    .875rem;
 // $font-weight-base:            $font-weight-normal !default;
 
 $line-height-base:                1;
-$line-height-sm:                  1;
+$line-height-sm:                  .75;
 $line-height-lg:                  1.1875;
 
 $h1-font-size:                    72px;
@@ -612,8 +612,8 @@ $h3-font-size:                    24px;
 // scss-docs-start table-variables
 $table-cell-padding-y:        1rem;
 $table-cell-padding-x:        .625rem;
-// $table-cell-padding-y-sm:     .25rem !default;
-// $table-cell-padding-x-sm:     .25rem !default;
+$table-cell-padding-y-sm:     .375rem;
+$table-cell-padding-x-sm:     .625rem;
 
 // $table-cell-vertical-align:   top !default;
 
