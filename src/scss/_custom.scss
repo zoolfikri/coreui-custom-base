@@ -76,6 +76,11 @@
   line-height: $line-height-sm !important;
 }
 
+.text-medium {
+  font-size: $font-size-md !important;
+  line-height: $line-height-base !important;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }

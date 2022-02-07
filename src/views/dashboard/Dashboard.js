@@ -10,6 +10,7 @@ const ClockTick = lazy(() => import('src/components/custom/ClockTick'))
 const LeadsAssignedStatus = lazy(() => import('./LeadsAssignedStatus'))
 const ResolvedStatus = lazy(() => import('./ResolvedStatus'))
 const LeadsTimeAverage = lazy(() => import('./LeadsTimeAverage'))
+const FaqCategory = lazy(() => import('./FaqCategory'))
 
 const month_options = [
   { id: 1, name: 'Januari' },
@@ -97,9 +98,11 @@ const Dashboard = () => {
       </div>
 
       <div className="row row-cols-1 row-cols-lg-2 g-3">
+        {/* Overview - Deal */}
         <div className="col"></div>
+
         <div className="col">
-          <div className="row row-cols-1 row-cols-lg-3 g-3">
+          <div className="row row-cols-1 row-cols-lg-3 g-3 mb-3">
             <div className="col">
               <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
                 <LeadsAssignedStatus filter={{ month: filter_month, year: filter_year }} />
@@ -113,6 +116,15 @@ const Dashboard = () => {
             <div className="col">
               <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
                 <LeadsTimeAverage filter={{ month: filter_month, year: filter_year }} />
+              </Visible>
+            </div>
+          </div>
+
+          {/* FAQ Category */}
+          <div className="row row-cols-1 g-3">
+            <div className="col">
+              <Visible when={(user) => ['MD'].includes(user.role)}>
+                <FaqCategory filter={{ month: filter_month, year: filter_year }} />
               </Visible>
             </div>
           </div>
