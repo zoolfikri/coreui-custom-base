@@ -7,7 +7,7 @@ import NumberFormat from 'react-number-format'
 import axios from 'axios'
 import Skeleton from 'react-loading-skeleton'
 
-const ReslovedStatus = ({ filter }) => {
+const FaqCategory = ({ filter }) => {
   const variables = useSelector((state) => state.variables)
   const access_token = useSelector((state) => state.access_token)
 
@@ -133,6 +133,6 @@ const ReslovedStatus = ({ filter }) => {
   )
 }
 
-ReslovedStatus.propTypes = { filter: PropTypes.object }
+FaqCategory.propTypes = { filter: PropTypes.object }
 
-export default ReslovedStatus
+export default FaqCategory
