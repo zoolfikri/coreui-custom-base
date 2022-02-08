@@ -11,6 +11,7 @@ const LeadsAssignedStatus = lazy(() => import('./LeadsAssignedStatus'))
 const ResolvedStatus = lazy(() => import('./ResolvedStatus'))
 const LeadsTimeAverage = lazy(() => import('./LeadsTimeAverage'))
 const FaqCategory = lazy(() => import('./FaqCategory'))
+const LeadsAssignedByDealer = lazy(() => import('./LeadsAssignedByDealer'))
 
 const month_options = [
   { id: 1, name: 'Januari' },
@@ -116,6 +117,15 @@ const Dashboard = () => {
             <div className="col">
               <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
                 <LeadsTimeAverage filter={{ month: filter_month, year: filter_year }} />
+              </Visible>
+            </div>
+          </div>
+
+          {/* Leads Assigned */}
+          <div className="row row-cols-1 g-3 mb-3">
+            <div className="col">
+              <Visible when={(user) => ['MD'].includes(user.role)}>
+                <LeadsAssignedByDealer filter={{ month: filter_month, year: filter_year }} />
               </Visible>
             </div>
           </div>
