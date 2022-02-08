@@ -196,6 +196,8 @@ function Table({
   selectableRow = false,
   getSelectedRows,
   rowId,
+  tableClassName,
+  pageLimit,
 }) {
   const {
     getTableProps,
@@ -221,7 +223,7 @@ function Table({
     {
       columns,
       data,
-      initialState: { pageIndex: 0 }, // Pass our hoisted table state
+      initialState: { pageIndex: 0, pageSize: pageLimit ? pageLimit : 10 }, // Pass our hoisted table state
       manualPagination: true, // Tell the usePagination
       manualGlobalFilter: true, // Manualy handle global filtering
       manualFilters: true, // Manualy handle filtering
@@ -400,7 +402,10 @@ function Table({
 
       {/* UI: Table */}
       <div className="table-responsive">
-        <table {...getTableProps()} className="table table-general">
+        <table
+          {...getTableProps()}
+          className={`${tableClassName ? tableClassName : 'table table-general'}`}
+        >
           <thead>
             {headerGroups.map((headerGroup, headerGroup_idx) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup_idx}>
@@ -574,11 +579,13 @@ Table.propTypes = {
   fetchData: PropTypes.func,
   loading: PropTypes.bool,
   pageCount: PropTypes.number,
+  pageLimit: PropTypes.number,
   selectableRow: PropTypes.bool,
   getSelectedRows: PropTypes.func,
   getToggleAllPageRowsSelectedProps: PropTypes.any,
   row: PropTypes.any,
   rowId: PropTypes.string,
+  tableClassName: PropTypes.string,
 }
 
 export default Table
