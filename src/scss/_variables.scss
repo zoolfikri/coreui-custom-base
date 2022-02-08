@@ -124,13 +124,13 @@ $yellow-orange:   #F7B500 !default;
 // fusv-enable
 
 // scss-docs-start theme-color-variables
-$primary:       $deep-saphire !default;
-// $secondary:     $secondary-base !default;
+$primary:       $deep-saphire;
+$secondary:     $mercury;
 // $success:       $success-base !default;
-$info:          $azure !default;
-$warning:       $yellow-orange !default;
-$danger:        $fire-red !default;
-$light:         $aqua-haze !default;
+$info:          $azure;
+$warning:       $yellow-orange;
+$danger:        $fire-red;
+$light:         $aqua-haze;
 // $dark:          $dark-base !default;
 // scss-docs-end theme-color-variables
 
@@ -436,7 +436,7 @@ $light:         $aqua-haze !default;
 // scss-docs-end border-variables
 
 // scss-docs-start border-radius-variables
-// $border-radius:               .25rem !default;
+$border-radius:               .5rem;
 // $border-radius-sm:            .2rem !default;
 // $border-radius-lg:            .3rem !default;
 // $border-radius-pill:          50rem !default;
@@ -491,7 +491,8 @@ $font-family-base:                "Open Sans", sans-serif;
 // $font-size-base effects the font size of the body text
 // $font-size-root:              null !default;
 $font-size-base:                  .75rem; // Assumes the browser default, typically `16px`
-$font-size-sm:                    .6875rem;
+$font-size-sm:                    .625rem; // It was 9px
+$font-size-md:                    .6875rem;
 $font-size-lg:                    .875rem;
 
 // $font-weight-lighter:         lighter !default;
@@ -505,7 +506,8 @@ $font-size-lg:                    .875rem;
 // $font-weight-base:            $font-weight-normal !default;
 
 $line-height-base:                1;
-$line-height-sm:                  1;
+$line-height-sm:                  1.2;
+$line-height-md:                  1.25;
 $line-height-lg:                  1.1875;
 
 $h1-font-size:                    72px;
@@ -612,8 +614,8 @@ $h3-font-size:                    24px;
 // scss-docs-start table-variables
 $table-cell-padding-y:        1rem;
 $table-cell-padding-x:        .625rem;
-// $table-cell-padding-y-sm:     .25rem !default;
-// $table-cell-padding-x-sm:     .25rem !default;
+$table-cell-padding-y-sm:     .375rem;
+$table-cell-padding-x-sm:     .625rem;
 
 // $table-cell-vertical-align:   top !default;
 
@@ -678,7 +680,7 @@ $input-btn-font-size:             .875rem;
 // $input-btn-focus-blur:          0 !default;
 // $input-btn-focus-box-shadow:    0 0 $input-btn-focus-blur $input-btn-focus-width $input-btn-focus-color !default;
 
-// $input-btn-padding-y-sm:      .25rem !default;
+$input-btn-padding-y-sm:      .3125rem;
 // $input-btn-padding-x-sm:      .5rem !default;
 // $input-btn-font-size-sm:      $font-size-sm !default;
 
@@ -1206,7 +1208,7 @@ $nav-link-font-size:                    0.75rem;
 // $card-cap-padding-x:                $card-spacer-x !default;
 // $card-cap-bg:                       rgba($black, .03) !default;
 // $card-cap-color:                    unset !default;
-// $card-height:                       null !default;
+$card-height:                       100%;
 // $card-color:                        unset !default;
 // $card-bg:                           $white !default;
 // $card-img-overlay-padding:          $spacer !default;

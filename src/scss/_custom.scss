@@ -71,6 +71,39 @@
   line-height: $line-height-base !important;
 }
 
+.text-small {
+  font-size: $font-size-sm !important;
+  line-height: $line-height-sm !important;
+}
+
+.text-medium {
+  font-size: $font-size-md !important;
+  line-height: $line-height-md !important;
+}
+
 .cursor-pointer {
   cursor: pointer;
+}
+
+// Dashboard
+.dashboard {
+  .leads-assigned-status,
+  .leads-time-average {
+    .name {
+      font-size: 10px;
+      line-height: 14px;
+      color: #979797;
+    }
+
+    .percentage {
+      font-size: 14px;
+      line-height: 19px;
+    }
+
+    .total {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 25px;
+    }
+  }
 }
