@@ -9,7 +9,7 @@ const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/welcome', name: 'Welcome Page', component: Welcome },
   { path: '/testable', name: 'Tes Table', component: Testable },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard },
+  { path: '/dashboard', name: 'Dashboard', component: Dashboard, role_access: ['DA', 'MD', 'RD'] },
 ]
 
 export default routes
