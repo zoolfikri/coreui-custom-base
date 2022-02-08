@@ -118,7 +118,7 @@ const ReslovedStatus = ({ filter }) => {
                     )
                   }
 
-                  return <></>
+                  return true
                 })}
                 <tr>
                   <td colSpan={2}>
