@@ -116,7 +116,7 @@ const LeadsAssignedByFlp = ({ filter }) => {
   const debouncedFetchData = useAsyncDebounce(fetchData, 300)
 
   React.useEffect(() => {
-    debouncedFetchData({ dataFilter: { ...filter, table_filter: searchParam }, page: currentPage })
+    debouncedFetchData({ dataFilter: { ...filter, filter: searchParam }, page: currentPage })
   }, [debouncedFetchData, filter, currentPage, searchParam])
 
   return (
