@@ -106,4 +106,18 @@
       line-height: 25px;
     }
   }
+  .overview-deal {
+    .border-bottom-absolute {
+      position: relative;
+      &:before {
+        content: "";
+        position: absolute;
+        left: 2px;
+        bottom: 0;
+        height: 2px;
+        width: calc(100% - 4px); /* or 100px */
+        border-bottom: 2px solid #ffffff;
+      }
+    }
+  }
 }

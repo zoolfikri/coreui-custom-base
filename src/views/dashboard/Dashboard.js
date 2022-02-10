@@ -13,6 +13,7 @@ const LeadsTimeAverage = lazy(() => import('./LeadsTimeAverage'))
 const FaqCategory = lazy(() => import('./FaqCategory'))
 const LeadsAssignedByDealer = lazy(() => import('./LeadsAssignedByDealer'))
 const LeadsAssignedByFlp = lazy(() => import('./LeadsAssignedByFlp'))
+const OverviewDeal = lazy(() => import('./OverviewDeal'))
 
 const month_options = [
   { id: 1, name: 'Januari' },
@@ -101,20 +102,27 @@ const Dashboard = () => {
 
       <div className="row row-cols-1 row-cols-lg-2 g-3">
         {/* Overview - Deal */}
-        <div className="col"></div>
+        <div className="col">
+          <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
+            <OverviewDeal filter={{ start_month: filter_month, year: filter_year }} />
+          </Visible>
+        </div>
 
         <div className="col">
           <div className="row row-cols-1 row-cols-lg-3 g-3 mb-3">
+            {/* Leads Assigned Status */}
             <div className="col">
               <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
                 <LeadsAssignedStatus filter={{ month: filter_month, year: filter_year }} />
               </Visible>
             </div>
+            {/* Resolved Status */}
             <div className="col">
               <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
                 <ResolvedStatus filter={{ month: filter_month, year: filter_year }} />
               </Visible>
             </div>
+            {/* Lead Time Average */}
             <div className="col">
               <Visible when={(user) => ['MD', 'RD'].includes(user.role)}>
                 <LeadsTimeAverage filter={{ month: filter_month, year: filter_year }} />
