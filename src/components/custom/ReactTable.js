@@ -17,7 +17,23 @@ import {
   faChevronLeft,
   faChevronRight,
   faSearch,
+  faMinus,
 } from '@fortawesome/free-solid-svg-icons'
+
+const month_options = [
+  { id: 1, name: 'Januari' },
+  { id: 2, name: 'Februari' },
+  { id: 3, name: 'Maret' },
+  { id: 4, name: 'April' },
+  { id: 5, name: 'Mei' },
+  { id: 6, name: 'Juni' },
+  { id: 7, name: 'Juli' },
+  { id: 8, name: 'Agustus' },
+  { id: 9, name: 'September' },
+  { id: 10, name: 'Oktober' },
+  { id: 11, name: 'November' },
+  { id: 12, name: 'Desember' },
+]
 
 function deepCompare() {
   var i, l, leftChain, rightChain
@@ -215,6 +231,7 @@ function Table({
   getSelectedRows,
   rowId,
   tableClassName,
+  filterableDate,
   pageLimit,
 }) {
   const defaultColumn = React.useMemo(
@@ -298,14 +315,29 @@ function Table({
   const [showFilterDropdown, setShowFilterDropdown] = React.useState(false)
   const [filterPerColumn, setFilterPerColumn] = React.useState({})
   const [tempSelectedRows, setTempSelectedRows] = React.useState({})
+  const [filterDate, setFilterDate] = React.useState({
+    start_month: new Date().getMonth() + 1,
+    end_month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+  })
 
   // Debounce our onFetchData call for 100ms
   const onFetchDataDebounced = useAsyncDebounce(fetchData, 100)
 
   // Listen for changes in pagination and use the state to fetch our new data debounced
   React.useEffect(() => {
-    onFetchDataDebounced({ pageIndex, pageSize, globalFilter, filters })
-  }, [onFetchDataDebounced, pageIndex, pageSize, globalFilter, filters])
+    let formatedFilters = { ...(filterableDate ? filterDate : {}), filterAll: globalFilter }
+    filters.map((o) => (formatedFilters[`filter[${o.id}]`] = o.value))
+    console.log('formatedFilters', formatedFilters)
+    onFetchDataDebounced({
+      pageIndex,
+      pageSize,
+      globalFilter,
+      filters,
+      filterDate,
+      formatedFilters,
+    })
+  }, [onFetchDataDebounced, pageIndex, pageSize, globalFilter, filters, filterDate, filterableDate])
 
   // Reset filter per column when global filter is set
   React.useEffect(() => {
@@ -356,7 +388,7 @@ function Table({
     <>
       {/* UI: Filtering */}
       <div className="row mb-3">
-        <div className="col-4">
+        <div className="col-6 col-md-4">
           <div className="input-group-icon input group">
             <FontAwesomeIcon icon={faSearch} className="icon" />
             <GlobalFilter
@@ -379,7 +411,6 @@ function Table({
               <div className="mb-4 text-title fw-bold text-primary">Filter</div>
               {headerGroups.map((headerGroup, headerGroup_idx) =>
                 headerGroup.headers.map((column, column_idx) => {
-                  console.log('column', column)
                   if (column?.filterable) {
                     if (column.Filter) {
                       return column.render('Filter', { setFilterPerColumn, filterPerColumn })
@@ -436,7 +467,84 @@ function Table({
             </CDropdownMenu>
           </CDropdown>
         </div>
-        <div className="col"></div>
+        <div className="col-6 col-md"></div>
+        <div className="col-auto">
+          {filterableDate ? (
+            <form className="row row-cols-auto g-2 align-items-center">
+              <div className="col">
+                <label className="visually-hidden" htmlFor="start_month">
+                  Start Month
+                </label>
+                <select
+                  id="start_month"
+                  className="form-select"
+                  onChange={(e) => {
+                    let currentFilterDate = { ...filterDate }
+                    currentFilterDate[e.target.id] = e.target.value
+                    setFilterDate(currentFilterDate)
+                  }}
+                  value={filterDate['start_month']}
+                >
+                  {month_options.map((month, month_idx) => (
+                    <option value={String(month.id)} key={month_idx}>
+                      {month.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col">
+                <FontAwesomeIcon icon={faMinus} />
+              </div>
+              <div className="col">
+                <label className="visually-hidden" htmlFor="end_month">
+                  End Month
+                </label>
+                <select
+                  id="end_month"
+                  className="form-select"
+                  onChange={(e) => {
+                    let currentFilterDate = { ...filterDate }
+                    currentFilterDate[e.target.id] = e.target.value
+                    setFilterDate(currentFilterDate)
+                  }}
+                  value={filterDate['end_month']}
+                >
+                  {month_options.map((month, month_idx) => (
+                    <option value={String(month.id)} key={month_idx}>
+                      {month.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col">
+                <label className="visually-hidden" htmlFor="end_yearmonth">
+                  Year
+                </label>
+                <select
+                  id="year"
+                  className="form-select"
+                  onChange={(e) => {
+                    let currentFilterDate = { ...filterDate }
+                    currentFilterDate[e.target.id] = e.target.value
+                    setFilterDate(currentFilterDate)
+                  }}
+                  value={filterDate['year']}
+                >
+                  {Array.from(Array(4), (e, year_idx) => (
+                    <option
+                      value={String(parseInt(year_idx + new Date().getFullYear() - 3))}
+                      key={year_idx}
+                    >
+                      {year_idx + new Date().getFullYear() - 3}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </form>
+          ) : (
+            ''
+          )}
+        </div>
       </div>
 
       {/* UI: Table */}
@@ -625,6 +733,7 @@ Table.propTypes = {
   row: PropTypes.any,
   rowId: PropTypes.string,
   tableClassName: PropTypes.string,
+  filterableDate: PropTypes.bool,
 }
 
 export default Table

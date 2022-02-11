@@ -50,8 +50,11 @@ function LeadsToConvert() {
         accessor: 'name',
         filterable: true,
         Cell: ({ row: { original } }) => (
-          <a href={'/#/customer_non_ro_convert/detail/' + original.id}>
-            {original.name} {original.is_handled_by_bot ? '' : <FontAwesomeIcon icon={faCheck} />}
+          <a
+            href={'/#/customer_non_ro_convert/detail/' + original.id}
+            className="text-decoration-none text-info"
+          >
+            {original.is_handled_by_bot ? '' : <FontAwesomeIcon icon={faCheck} />} {original.name}
           </a>
         ),
       },
@@ -98,15 +101,12 @@ function LeadsToConvert() {
   const fetchIdRef = React.useRef(0)
 
   const fetchData = React.useCallback(
-    ({ pageSize, pageIndex, filters, globalFilter }) => {
+    ({ pageSize, pageIndex, formatedFilters }) => {
       const fetchId = ++fetchIdRef.current
 
       if (fetchId === fetchIdRef.current) {
         // Set the loading state
         setLoading(true)
-
-        let columnFilter = {}
-        filters.map((o) => (columnFilter[`filter[${o.id}]`] = o.value))
 
         axios({
           method: 'post',
@@ -118,11 +118,7 @@ function LeadsToConvert() {
           params: {
             limit: pageSize,
             page: pageIndex + 1,
-            start_month: 2,
-            end_month: 2,
-            year: 2022,
-            filterAll: globalFilter,
-            ...columnFilter,
+            ...formatedFilters,
           },
           data: {
             main_dealer_id: 4,
@@ -157,6 +153,7 @@ function LeadsToConvert() {
         fetchData={fetchData}
         loading={loading}
         pageCount={pageCount}
+        filterableDate
       />
     </div>
   )
