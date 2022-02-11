@@ -7,6 +7,10 @@ import * as serviceWorker from './serviceWorker'
 import { Provider } from 'react-redux'
 import store from './store'
 import './interceptor'
+import moment from 'moment'
+import 'moment/min/locales'
+
+moment.locale('id')
 
 ReactDOM.render(
   <Provider store={store}>

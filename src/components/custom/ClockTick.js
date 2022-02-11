@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import moment from 'moment'
-import 'moment/min/locales'
 
 function Clock({ className }) {
   const [date, setDate] = useState(new Date())
@@ -18,7 +17,6 @@ function Clock({ className }) {
   }, [])
 
   const moment_id = moment(date)
-  moment_id.locale('id')
 
   return <span className={className}>{moment_id.format('D MMMM YYYY HH:mm:ss')}</span>
 }

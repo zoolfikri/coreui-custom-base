@@ -132,6 +132,26 @@ function deepCompare() {
   return true
 }
 
+function DefaultColumnFilter({ setFilterPerColumn, filterPerColumn, column }) {
+  return (
+    <input
+      className="form-control mb-3"
+      placeholder={column.render('Header')}
+      value={filterPerColumn?.[column.id] ? filterPerColumn[column.id] : ''}
+      onChange={(e) =>
+        setFilterPerColumn((prev) => {
+          return { ...prev, [column.id]: e.target.value }
+        })
+      }
+    />
+  )
+}
+DefaultColumnFilter.propTypes = {
+  setFilterPerColumn: PropTypes.func,
+  filterPerColumn: PropTypes.object,
+  column: PropTypes.object,
+}
+
 function GlobalFilter({ globalFilter, setGlobalFilter }) {
   const [value, setValue] = React.useState(globalFilter)
   const onChange = useAsyncDebounce((value) => {
@@ -154,7 +174,6 @@ function GlobalFilter({ globalFilter, setGlobalFilter }) {
     />
   )
 }
-
 GlobalFilter.propTypes = {
   globalFilter: PropTypes.string,
   setGlobalFilter: PropTypes.func,
@@ -174,7 +193,6 @@ const IndeterminateCheckbox = React.forwardRef(({ indeterminate, ...rest }, ref)
     </>
   )
 })
-
 IndeterminateCheckbox.displayName = 'IndeterminateCheckbox'
 IndeterminateCheckbox.propTypes = {
   indeterminate: PropTypes.any,
@@ -199,6 +217,14 @@ function Table({
   tableClassName,
   pageLimit,
 }) {
+  const defaultColumn = React.useMemo(
+    () => ({
+      // Let's set up our default Filter UI
+      Filter: DefaultColumnFilter,
+    }),
+    [],
+  )
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -223,6 +249,7 @@ function Table({
     {
       columns,
       data,
+      defaultColumn, // Be sure to pass the defaultColumn option
       initialState: { pageIndex: 0, pageSize: pageLimit ? pageLimit : 10 }, // Pass our hoisted table state
       manualPagination: true, // Tell the usePagination
       manualGlobalFilter: true, // Manualy handle global filtering
@@ -275,7 +302,7 @@ function Table({
   // Debounce our onFetchData call for 100ms
   const onFetchDataDebounced = useAsyncDebounce(fetchData, 100)
 
-  // Listen for changes in pagination and use the state to fetch our new data
+  // Listen for changes in pagination and use the state to fetch our new data debounced
   React.useEffect(() => {
     onFetchDataDebounced({ pageIndex, pageSize, globalFilter, filters })
   }, [onFetchDataDebounced, pageIndex, pageSize, globalFilter, filters])
@@ -351,19 +378,31 @@ function Table({
             <CDropdownMenu className="container px-5 py-3">
               <div className="mb-4 text-title fw-bold text-primary">Filter</div>
               {headerGroups.map((headerGroup, headerGroup_idx) =>
-                headerGroup.headers.map((column, column_idx) => (
-                  <input
-                    key={`${headerGroup_idx} ${column_idx}`}
-                    className="form-control mb-3"
-                    placeholder={column.render('Header')}
-                    value={filterPerColumn?.[column.id] ? filterPerColumn[column.id] : ''}
-                    onChange={(e) =>
-                      setFilterPerColumn((prev) => {
-                        return { ...prev, [column.id]: e.target.value }
-                      })
+                headerGroup.headers.map((column, column_idx) => {
+                  console.log('column', column)
+                  if (column?.filterable) {
+                    if (column.Filter) {
+                      return column.render('Filter', { setFilterPerColumn, filterPerColumn })
                     }
-                  />
-                )),
+                    // else {
+                    //   return (
+                    //     <input
+                    //       key={`${headerGroup_idx} ${column_idx}`}
+                    //       className="form-control mb-3"
+                    //       placeholder={column.render('Header')}
+                    //       value={filterPerColumn?.[column.id] ? filterPerColumn[column.id] : ''}
+                    //       onChange={(e) =>
+                    //         setFilterPerColumn((prev) => {
+                    //           return { ...prev, [column.id]: e.target.value }
+                    //         })
+                    //       }
+                    //     />
+                    //   )
+                    // }
+                  }
+
+                  return <></>
+                }),
               )}
               <div className="d-flex justify-content-end">
                 <button

@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { HashRouter, Route, Switch, Redirect } from 'react-router-dom'
 import './scss/style.scss'
 import 'react-loading-skeleton/dist/skeleton.css'
+import 'react-datepicker/dist/react-datepicker.css'
 
 const loading = (
   <div className="pt-3 text-center">

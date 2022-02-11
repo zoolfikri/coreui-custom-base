@@ -23,7 +23,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Leads to Convert',
-        to: '/testable',
+        to: '/hotleads/leads-to-convert',
       },
       {
         component: CNavItem,
