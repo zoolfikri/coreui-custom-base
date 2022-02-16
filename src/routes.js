@@ -5,6 +5,7 @@ const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 
 // Hotleads
 const LeadsToConvert = React.lazy(() => import('./views/hotleads/LeadsToConvert'))
+const LeadsToConvertDetail = React.lazy(() => import('./views/hotleads/LeadsToConvertDetail'))
 
 const Testable = React.lazy(() => import('./views/testable/Testable'))
 
@@ -22,8 +23,16 @@ const routes = [
   },
   {
     path: '/hotleads/leads-to-convert',
+    exact: true,
     name: 'Leads to Convert',
     component: LeadsToConvert,
+    role_access: ['DA', 'MD', 'RD'],
+  },
+  {
+    path: '/hotleads/leads-to-convert/:id',
+    exact: true,
+    name: 'Leads to Convert Detail',
+    component: LeadsToConvertDetail,
     role_access: ['DA', 'MD', 'RD'],
   },
 ]

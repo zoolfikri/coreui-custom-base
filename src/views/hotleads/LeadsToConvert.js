@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import ReactTable from 'src/components/custom/ReactTable'
 import DatePicker from 'react-datepicker'
@@ -50,12 +51,12 @@ function LeadsToConvert() {
         accessor: 'name',
         filterable: true,
         Cell: ({ row: { original } }) => (
-          <a
-            href={'/#/customer_non_ro_convert/detail/' + original.id}
+          <Link
+            to={'/hotleads/leads-to-convert/' + original.id}
             className="text-decoration-none text-info"
           >
             {original.is_handled_by_bot ? '' : <FontAwesomeIcon icon={faCheck} />} {original.name}
-          </a>
+          </Link>
         ),
       },
       {
@@ -121,7 +122,7 @@ function LeadsToConvert() {
             ...formatedFilters,
           },
           data: {
-            main_dealer_id: 4,
+            main_dealer_id: variables.main_dealer_id,
           },
         }).then(
           (result) => {
@@ -142,7 +143,7 @@ function LeadsToConvert() {
         )
       }
     },
-    [access_token, variables.api_base_url],
+    [access_token, variables.api_base_url, variables.main_dealer_id],
   )
 
   return (
@@ -153,7 +154,7 @@ function LeadsToConvert() {
         fetchData={fetchData}
         loading={loading}
         pageCount={pageCount}
-        filterableDate
+        showDateFilter
       />
     </div>
   )
