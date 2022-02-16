@@ -14,7 +14,7 @@ $white:     #fff !default;
 // $gray-500:  #9da5b1 !default;
 // $gray-600:  #8a93a2 !default;
 // $gray-700:  #768192 !default;
-// $gray-800:  #636f83 !default;
+$gray-800:  #636f83 !default;
 // $gray-900:  #4f5d73 !default;
 // $black:     #000015 !default;
 // scss-docs-end gray-color-variables
@@ -923,8 +923,8 @@ $input-btn-padding-y-sm:      .3125rem;
 // $form-select-disabled-border-color: $input-disabled-border-color !default;
 // $form-select-bg-position:           right $form-select-padding-x center !default;
 // $form-select-bg-size:               16px 12px !default; // In pixels because image dimensions
-// $form-select-indicator-color:       $gray-800 !default;
-// $form-select-indicator:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/></svg>") !default;
+$form-select-indicator-color:       $gray-800;
+$form-select-indicator:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='#{$form-select-indicator-color}' stroke='#{$form-select-indicator-color}' d='M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z'/></svg>") !default;
 
 // $form-select-feedback-icon-padding-end: $form-select-padding-x * 2.5 + $form-select-indicator-padding !default;
 // $form-select-feedback-icon-position:    center right $form-select-indicator-padding !default;

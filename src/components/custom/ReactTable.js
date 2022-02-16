@@ -17,7 +17,23 @@ import {
   faChevronLeft,
   faChevronRight,
   faSearch,
+  faMinus,
 } from '@fortawesome/free-solid-svg-icons'
+
+const month_options = [
+  { id: 1, name: 'Januari' },
+  { id: 2, name: 'Februari' },
+  { id: 3, name: 'Maret' },
+  { id: 4, name: 'April' },
+  { id: 5, name: 'Mei' },
+  { id: 6, name: 'Juni' },
+  { id: 7, name: 'Juli' },
+  { id: 8, name: 'Agustus' },
+  { id: 9, name: 'September' },
+  { id: 10, name: 'Oktober' },
+  { id: 11, name: 'November' },
+  { id: 12, name: 'Desember' },
+]
 
 function deepCompare() {
   var i, l, leftChain, rightChain
@@ -132,6 +148,26 @@ function deepCompare() {
   return true
 }
 
+function DefaultColumnFilter({ setFilterPerColumn, filterPerColumn, column }) {
+  return (
+    <input
+      className="form-control mb-3"
+      placeholder={column.render('Header')}
+      value={filterPerColumn?.[column.id] ? filterPerColumn[column.id] : ''}
+      onChange={(e) =>
+        setFilterPerColumn((prev) => {
+          return { ...prev, [column.id]: e.target.value }
+        })
+      }
+    />
+  )
+}
+DefaultColumnFilter.propTypes = {
+  setFilterPerColumn: PropTypes.func,
+  filterPerColumn: PropTypes.object,
+  column: PropTypes.object,
+}
+
 function GlobalFilter({ globalFilter, setGlobalFilter }) {
   const [value, setValue] = React.useState(globalFilter)
   const onChange = useAsyncDebounce((value) => {
@@ -154,7 +190,6 @@ function GlobalFilter({ globalFilter, setGlobalFilter }) {
     />
   )
 }
-
 GlobalFilter.propTypes = {
   globalFilter: PropTypes.string,
   setGlobalFilter: PropTypes.func,
@@ -174,7 +209,6 @@ const IndeterminateCheckbox = React.forwardRef(({ indeterminate, ...rest }, ref)
     </>
   )
 })
-
 IndeterminateCheckbox.displayName = 'IndeterminateCheckbox'
 IndeterminateCheckbox.propTypes = {
   indeterminate: PropTypes.any,
@@ -197,8 +231,17 @@ function Table({
   getSelectedRows,
   rowId,
   tableClassName,
+  showDateFilter,
   pageLimit,
 }) {
+  const defaultColumn = React.useMemo(
+    () => ({
+      // Let's set up our default Filter UI
+      Filter: DefaultColumnFilter,
+    }),
+    [],
+  )
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -223,6 +266,7 @@ function Table({
     {
       columns,
       data,
+      defaultColumn, // Be sure to pass the defaultColumn option
       initialState: { pageIndex: 0, pageSize: pageLimit ? pageLimit : 10 }, // Pass our hoisted table state
       manualPagination: true, // Tell the usePagination
       manualGlobalFilter: true, // Manualy handle global filtering
@@ -271,14 +315,29 @@ function Table({
   const [showFilterDropdown, setShowFilterDropdown] = React.useState(false)
   const [filterPerColumn, setFilterPerColumn] = React.useState({})
   const [tempSelectedRows, setTempSelectedRows] = React.useState({})
+  const [filterDate, setFilterDate] = React.useState({
+    start_month: new Date().getMonth() + 1,
+    end_month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+  })
 
   // Debounce our onFetchData call for 100ms
   const onFetchDataDebounced = useAsyncDebounce(fetchData, 100)
 
-  // Listen for changes in pagination and use the state to fetch our new data
+  // Listen for changes in pagination and use the state to fetch our new data debounced
   React.useEffect(() => {
-    onFetchDataDebounced({ pageIndex, pageSize, globalFilter, filters })
-  }, [onFetchDataDebounced, pageIndex, pageSize, globalFilter, filters])
+    let formatedFilters = { ...(showDateFilter ? filterDate : {}), filterAll: globalFilter }
+    filters.map((o) => (formatedFilters[`filter[${o.id}]`] = o.value))
+    // console.log('formatedFilters', formatedFilters)
+    onFetchDataDebounced({
+      pageIndex,
+      pageSize,
+      globalFilter,
+      filters,
+      filterDate,
+      formatedFilters,
+    })
+  }, [onFetchDataDebounced, pageIndex, pageSize, globalFilter, filters, filterDate, showDateFilter])
 
   // Reset filter per column when global filter is set
   React.useEffect(() => {
@@ -290,13 +349,13 @@ function Table({
 
   // Listen for selected rows
   React.useEffect(() => {
-    console.log('selectedRowIds', selectedRowIds)
-    console.log('selectedFlatRows', selectedFlatRows)
-    console.log('tempSelectedRows', tempSelectedRows)
+    // console.log('selectedRowIds', selectedRowIds)
+    // console.log('selectedFlatRows', selectedFlatRows)
+    // console.log('tempSelectedRows', tempSelectedRows)
     if (deepCompare(Object.keys(tempSelectedRows), Object.keys(selectedRowIds))) {
-      console.log('DEEP COMPARE TRUE')
+      // console.log('DEEP COMPARE TRUE')
     } else {
-      console.log('DEEP COMPARE FALSE')
+      // console.log('DEEP COMPARE FALSE')
       let temp = {}
       Object.keys(selectedRowIds).map((key) => {
         if (tempSelectedRows[key]) {
@@ -314,7 +373,7 @@ function Table({
   }, [selectedRowIds, tempSelectedRows, selectedFlatRows])
 
   React.useEffect(() => {
-    console.log('!!! HOOK getSelectedRows')
+    // console.log('!!! HOOK getSelectedRows')
     if (getSelectedRows) {
       const returnedRows = []
       Object.keys(tempSelectedRows).map((key) => returnedRows.push(tempSelectedRows[key]))
@@ -329,7 +388,7 @@ function Table({
     <>
       {/* UI: Filtering */}
       <div className="row mb-3">
-        <div className="col-4">
+        <div className="col-6 col-md-4">
           <div className="input-group-icon input group">
             <FontAwesomeIcon icon={faSearch} className="icon" />
             <GlobalFilter
@@ -351,19 +410,30 @@ function Table({
             <CDropdownMenu className="container px-5 py-3">
               <div className="mb-4 text-title fw-bold text-primary">Filter</div>
               {headerGroups.map((headerGroup, headerGroup_idx) =>
-                headerGroup.headers.map((column, column_idx) => (
-                  <input
-                    key={`${headerGroup_idx} ${column_idx}`}
-                    className="form-control mb-3"
-                    placeholder={column.render('Header')}
-                    value={filterPerColumn?.[column.id] ? filterPerColumn[column.id] : ''}
-                    onChange={(e) =>
-                      setFilterPerColumn((prev) => {
-                        return { ...prev, [column.id]: e.target.value }
-                      })
+                headerGroup.headers.map((column, column_idx) => {
+                  if (column?.filterable) {
+                    if (column.Filter) {
+                      return column.render('Filter', { setFilterPerColumn, filterPerColumn })
                     }
-                  />
-                )),
+                    // else {
+                    //   return (
+                    //     <input
+                    //       key={`${headerGroup_idx} ${column_idx}`}
+                    //       className="form-control mb-3"
+                    //       placeholder={column.render('Header')}
+                    //       value={filterPerColumn?.[column.id] ? filterPerColumn[column.id] : ''}
+                    //       onChange={(e) =>
+                    //         setFilterPerColumn((prev) => {
+                    //           return { ...prev, [column.id]: e.target.value }
+                    //         })
+                    //       }
+                    //     />
+                    //   )
+                    // }
+                  }
+
+                  return <></>
+                }),
               )}
               <div className="d-flex justify-content-end">
                 <button
@@ -397,7 +467,84 @@ function Table({
             </CDropdownMenu>
           </CDropdown>
         </div>
-        <div className="col"></div>
+        <div className="col-6 col-md"></div>
+        <div className="col-auto">
+          {showDateFilter ? (
+            <form className="row row-cols-auto g-2 align-items-center">
+              <div className="col">
+                <label className="visually-hidden" htmlFor="start_month">
+                  Start Month
+                </label>
+                <select
+                  id="start_month"
+                  className="form-select"
+                  onChange={(e) => {
+                    let currentFilterDate = { ...filterDate }
+                    currentFilterDate[e.target.id] = e.target.value
+                    setFilterDate(currentFilterDate)
+                  }}
+                  value={filterDate['start_month']}
+                >
+                  {month_options.map((month, month_idx) => (
+                    <option value={String(month.id)} key={month_idx}>
+                      {month.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col">
+                <FontAwesomeIcon icon={faMinus} />
+              </div>
+              <div className="col">
+                <label className="visually-hidden" htmlFor="end_month">
+                  End Month
+                </label>
+                <select
+                  id="end_month"
+                  className="form-select"
+                  onChange={(e) => {
+                    let currentFilterDate = { ...filterDate }
+                    currentFilterDate[e.target.id] = e.target.value
+                    setFilterDate(currentFilterDate)
+                  }}
+                  value={filterDate['end_month']}
+                >
+                  {month_options.map((month, month_idx) => (
+                    <option value={String(month.id)} key={month_idx}>
+                      {month.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col">
+                <label className="visually-hidden" htmlFor="end_yearmonth">
+                  Year
+                </label>
+                <select
+                  id="year"
+                  className="form-select"
+                  onChange={(e) => {
+                    let currentFilterDate = { ...filterDate }
+                    currentFilterDate[e.target.id] = e.target.value
+                    setFilterDate(currentFilterDate)
+                  }}
+                  value={filterDate['year']}
+                >
+                  {Array.from(Array(4), (e, year_idx) => (
+                    <option
+                      value={String(parseInt(year_idx + new Date().getFullYear() - 3))}
+                      key={year_idx}
+                    >
+                      {year_idx + new Date().getFullYear() - 3}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </form>
+          ) : (
+            ''
+          )}
+        </div>
       </div>
 
       {/* UI: Table */}
@@ -410,7 +557,7 @@ function Table({
             {headerGroups.map((headerGroup, headerGroup_idx) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup_idx}>
                 {headerGroup.headers.map((column, column_idx) => (
-                  <th {...column.getHeaderProps()} key={column_idx}>
+                  <th {...column.getHeaderProps()} className={column.THClassName} key={column_idx}>
                     {column.render('Header')}
                     <span>{column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}</span>
                   </th>
@@ -425,7 +572,11 @@ function Table({
                 <tr {...row.getRowProps()} key={i}>
                   {row.cells.map((cell, cell_idx) => {
                     return (
-                      <td {...cell.getCellProps()} key={cell_idx}>
+                      <td
+                        className={cell.column.TDClassName}
+                        {...cell.getCellProps()}
+                        key={cell_idx}
+                      >
                         {cell.render('Cell')}
                       </td>
                     )
@@ -586,6 +737,7 @@ Table.propTypes = {
   row: PropTypes.any,
   rowId: PropTypes.string,
   tableClassName: PropTypes.string,
+  showDateFilter: PropTypes.bool,
 }
 
 export default Table
