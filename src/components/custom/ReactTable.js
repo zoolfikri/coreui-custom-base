@@ -231,7 +231,7 @@ function Table({
   getSelectedRows,
   rowId,
   tableClassName,
-  filterableDate,
+  showDateFilter,
   pageLimit,
 }) {
   const defaultColumn = React.useMemo(
@@ -326,9 +326,9 @@ function Table({
 
   // Listen for changes in pagination and use the state to fetch our new data debounced
   React.useEffect(() => {
-    let formatedFilters = { ...(filterableDate ? filterDate : {}), filterAll: globalFilter }
+    let formatedFilters = { ...(showDateFilter ? filterDate : {}), filterAll: globalFilter }
     filters.map((o) => (formatedFilters[`filter[${o.id}]`] = o.value))
-    console.log('formatedFilters', formatedFilters)
+    // console.log('formatedFilters', formatedFilters)
     onFetchDataDebounced({
       pageIndex,
       pageSize,
@@ -337,7 +337,7 @@ function Table({
       filterDate,
       formatedFilters,
     })
-  }, [onFetchDataDebounced, pageIndex, pageSize, globalFilter, filters, filterDate, filterableDate])
+  }, [onFetchDataDebounced, pageIndex, pageSize, globalFilter, filters, filterDate, showDateFilter])
 
   // Reset filter per column when global filter is set
   React.useEffect(() => {
@@ -349,13 +349,13 @@ function Table({
 
   // Listen for selected rows
   React.useEffect(() => {
-    console.log('selectedRowIds', selectedRowIds)
-    console.log('selectedFlatRows', selectedFlatRows)
-    console.log('tempSelectedRows', tempSelectedRows)
+    // console.log('selectedRowIds', selectedRowIds)
+    // console.log('selectedFlatRows', selectedFlatRows)
+    // console.log('tempSelectedRows', tempSelectedRows)
     if (deepCompare(Object.keys(tempSelectedRows), Object.keys(selectedRowIds))) {
-      console.log('DEEP COMPARE TRUE')
+      // console.log('DEEP COMPARE TRUE')
     } else {
-      console.log('DEEP COMPARE FALSE')
+      // console.log('DEEP COMPARE FALSE')
       let temp = {}
       Object.keys(selectedRowIds).map((key) => {
         if (tempSelectedRows[key]) {
@@ -373,7 +373,7 @@ function Table({
   }, [selectedRowIds, tempSelectedRows, selectedFlatRows])
 
   React.useEffect(() => {
-    console.log('!!! HOOK getSelectedRows')
+    // console.log('!!! HOOK getSelectedRows')
     if (getSelectedRows) {
       const returnedRows = []
       Object.keys(tempSelectedRows).map((key) => returnedRows.push(tempSelectedRows[key]))
@@ -469,7 +469,7 @@ function Table({
         </div>
         <div className="col-6 col-md"></div>
         <div className="col-auto">
-          {filterableDate ? (
+          {showDateFilter ? (
             <form className="row row-cols-auto g-2 align-items-center">
               <div className="col">
                 <label className="visually-hidden" htmlFor="start_month">
@@ -557,7 +557,7 @@ function Table({
             {headerGroups.map((headerGroup, headerGroup_idx) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup_idx}>
                 {headerGroup.headers.map((column, column_idx) => (
-                  <th {...column.getHeaderProps()} key={column_idx}>
+                  <th {...column.getHeaderProps()} className={column.THClassName} key={column_idx}>
                     {column.render('Header')}
                     <span>{column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}</span>
                   </th>
@@ -572,7 +572,11 @@ function Table({
                 <tr {...row.getRowProps()} key={i}>
                   {row.cells.map((cell, cell_idx) => {
                     return (
-                      <td {...cell.getCellProps()} key={cell_idx}>
+                      <td
+                        className={cell.column.TDClassName}
+                        {...cell.getCellProps()}
+                        key={cell_idx}
+                      >
                         {cell.render('Cell')}
                       </td>
                     )
@@ -733,7 +737,7 @@ Table.propTypes = {
   row: PropTypes.any,
   rowId: PropTypes.string,
   tableClassName: PropTypes.string,
-  filterableDate: PropTypes.bool,
+  showDateFilter: PropTypes.bool,
 }
 
 export default Table
