@@ -23,6 +23,8 @@ function LeadsToConvertDetail() {
   const [loading, setLoading] = React.useState(false)
   const [province_options, setProvince_options] = React.useState([])
   const [city_options, setCity_options] = React.useState([])
+  const [subdistrict_options, setSubdistrict_options] = React.useState([])
+  const [sales_options, setSales_options] = React.useState([])
 
   const columnsRD = React.useMemo(
     () => [
@@ -50,43 +52,10 @@ function LeadsToConvertDetail() {
     [],
   )
 
-  const getSalesOptions = async (search, loadedOptions, { page, province_id }) => {
-    try {
-      const response = await axios({
-        method: 'post',
-        baseURL: variables.api_base_url,
-        url: 'api/cms/get-data-sp',
-        headers: { Authorization: access_token },
-        params: {
-          page,
-          limit: 5,
-          'filter[name]': search,
-        },
-        data: {
-          province_id,
-        },
-      })
-
-      const { data } = response.data
-
-      setCity_options(city_options.concat(data.data))
-
-      return {
-        options: data.data,
-        hasMore: data.last_page > page,
-        additional: {
-          page: page + 1,
-          province_id,
-        },
-      }
-    } catch (err) {
-      return {
-        options: [],
-        hasMore: false,
-        additional: {
-          page: page,
-        },
-      }
+  const getSalesOptions = (search, loadedOptions, additional) => {
+    return {
+      options: sales_options,
+      hasMore: false,
     }
   }
 
@@ -134,7 +103,7 @@ function LeadsToConvertDetail() {
 
       const { data } = response.data
 
-      setCity_options(city_options.concat(data.data))
+      setCity_options(loadedOptions.concat(data.data))
 
       return {
         options: data.data,
@@ -149,7 +118,49 @@ function LeadsToConvertDetail() {
         options: [],
         hasMore: false,
         additional: {
-          page: page,
+          page,
+          province_id,
+        },
+      }
+    }
+  }
+
+  const getSubdistrictOptions = async (search, loadedOptions, { page, city_id }) => {
+    try {
+      const response = await axios({
+        method: 'post',
+        baseURL: variables.api_base_url,
+        url: 'api/cms/get-subdistrict-by-city-id',
+        headers: { Authorization: access_token },
+        params: {
+          page,
+          limit: 5,
+          'filter[name]': search,
+        },
+        data: {
+          city_id,
+        },
+      })
+
+      const { data } = response.data
+
+      setSubdistrict_options(loadedOptions.concat(data.data))
+
+      return {
+        options: data.data,
+        hasMore: data.last_page > page,
+        additional: {
+          page: page + 1,
+          city_id,
+        },
+      }
+    } catch (err) {
+      return {
+        options: [],
+        hasMore: false,
+        additional: {
+          page,
+          city_id,
         },
       }
     }
@@ -349,7 +360,10 @@ function LeadsToConvertDetail() {
                     let tempDataLeads = { ...dataLeads }
                     tempDataLeads['retail_dealer_id'] = values.id
                     tempDataLeads['retail_name'] = values.name
+                    tempDataLeads['sales_people_id'] = ''
+
                     setDataLeads(tempDataLeads)
+                    setSales_options(Array.isArray(values?.sales_person) ? values.sales_person : [])
                   }}
                 />
               </div>
@@ -359,18 +373,16 @@ function LeadsToConvertDetail() {
 
                 <SelectAsyncPaginate
                   className={dataLeads?.projectId ? 'is-invalid' : ''}
-                  value={province_options.filter((o) => o.id === dataLeads?.sales_people_id)}
-                  loadOptions={getProvinceOptions}
+                  value={sales_options.filter((o) => o.id === dataLeads?.sales_people_id)}
+                  loadOptions={getSalesOptions}
                   onChange={(selected) => {
                     let tempDataLeads = { ...dataLeads }
                     tempDataLeads['sales_people_id'] = selected?.id
                     setDataLeads(tempDataLeads)
                   }}
                   getOptionValue={(option) => option.id}
-                  getOptionLabel={(option) => option.name}
-                  additional={{
-                    page: 1,
-                  }}
+                  getOptionLabel={(option) => option.username}
+                  cacheUniqs={[dataLeads?.['retail_dealer_id']]}
                 />
               </div>
             </div>
@@ -433,6 +445,10 @@ function LeadsToConvertDetail() {
                   onChange={(selected) => {
                     let tempDataLeads = { ...dataLeads }
                     tempDataLeads['province_id'] = selected?.id
+                    tempDataLeads['city_id'] = ''
+                    tempDataLeads['city_name'] = ''
+                    tempDataLeads['subdistrict_id'] = ''
+                    tempDataLeads['subdistrict'] = ''
                     setDataLeads(tempDataLeads)
                   }}
                   getOptionValue={(option) => option.id}
@@ -452,6 +468,9 @@ function LeadsToConvertDetail() {
                   onChange={(selected) => {
                     let tempDataLeads = { ...dataLeads }
                     tempDataLeads['city_id'] = selected?.id
+                    tempDataLeads['city_name'] = selected?.name
+                    tempDataLeads['subdistrict_id'] = ''
+                    tempDataLeads['subdistrict'] = ''
                     setDataLeads(tempDataLeads)
                   }}
                   getOptionValue={(option) => option.id}
@@ -460,9 +479,29 @@ function LeadsToConvertDetail() {
                     page: 1,
                     province_id: dataLeads.province_id,
                   }}
-                  shouldLoadMore={() => {
-                    return true
+                  cacheUniqs={[dataLeads?.['province_id']]}
+                />
+              </div>
+
+              <div className="mb-3">
+                <CFormLabel htmlFor="subdistrict_id">Kecamatan</CFormLabel>
+
+                <SelectAsyncPaginate
+                  value={subdistrict_options.filter((o) => o.id === dataLeads?.subdistrict_id)}
+                  loadOptions={getSubdistrictOptions}
+                  onChange={(selected) => {
+                    let tempDataLeads = { ...dataLeads }
+                    tempDataLeads['subdistrict_id'] = selected?.id
+                    tempDataLeads['subdistrict'] = selected?.name
+                    setDataLeads(tempDataLeads)
                   }}
+                  getOptionValue={(option) => option.id}
+                  getOptionLabel={(option) => option.name}
+                  additional={{
+                    page: 1,
+                    city_id: dataLeads.city_id,
+                  }}
+                  cacheUniqs={[dataLeads?.['city_id']]}
                 />
               </div>
             </div>
