@@ -19,6 +19,7 @@ const SelectAsyncPaginate = ({
   loadOptionsOnMenuOpen,
   shouldLoadMore,
   cacheUniqs,
+  reduceOptions,
 }) => {
   return (
     <AsyncPaginate
@@ -46,6 +47,7 @@ const SelectAsyncPaginate = ({
       loadOptionsOnMenuOpen={loadOptionsOnMenuOpen}
       shouldLoadMore={shouldLoadMore}
       cacheUniqs={cacheUniqs}
+      reduceOptions={reduceOptions}
     />
   )
 }
@@ -62,6 +64,7 @@ SelectAsyncPaginate.propTypes = {
   loadOptionsOnMenuOpen: PropTypes.bool,
   shouldLoadMore: PropTypes.func,
   cacheUniqs: PropTypes.array,
+  reduceOptions: PropTypes.func,
 }
 
 export default SelectAsyncPaginate
