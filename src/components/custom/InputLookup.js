@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import {
@@ -32,6 +32,8 @@ const InputLookup = ({
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   const [pageCount, setPageCount] = useState(0)
+
+  const searchButton = useRef(null)
 
   const fetchData = useCallback(
     ({ pageSize, pageIndex, formatedFilters }) => {
@@ -88,6 +90,7 @@ const InputLookup = ({
           type="button"
           id={id}
           onClick={() => setVisible(!visible)}
+          ref={searchButton}
         >
           <FontAwesomeIcon icon={faSearch} />
         </button>
@@ -99,6 +102,7 @@ const InputLookup = ({
             return true
           }}
           aria-describedby={id}
+          onFocus={(e) => searchButton.current.click()}
         />
       </div>
 
