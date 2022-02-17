@@ -52,35 +52,72 @@ function LeadsToConvertDetail() {
     [],
   )
 
-  const getSalesOptions = (search, loadedOptions, additional) => {
+  const getSalesOptions = async (search, loadedOptions, additional) => {
+    if (additional?.['inititalLoad']) {
+      try {
+        const response = await axios({
+          method: 'get',
+          baseURL: variables.api_base_url,
+          url: 'api/cms/get-data-sp',
+          headers: { Authorization: access_token },
+          params: { retail_dealer_id: additional?.['retail_dealer_id'] },
+        })
+        const { data } = response.data
+
+        setSales_options(Array.isArray(data) ? data : [])
+
+        return {
+          options: Array.isArray(data) ? data : [],
+          hasMore: false,
+          additional,
+        }
+      } catch (err) {
+        return {
+          options: [],
+          hasMore: false,
+          additional,
+        }
+      }
+    }
     return {
       options: sales_options,
       hasMore: false,
+      additional,
     }
   }
 
   const getProvinceOptions = async (search, loadedOptions, { page }) => {
-    const response = await axios({
-      method: 'get',
-      baseURL: variables.api_base_url,
-      url: 'api/cms/get-list-province-non-ro',
-      headers: { Authorization: access_token },
-      params: {
-        page,
-        limit: 5,
-        'filter[name]': search,
-      },
-    })
-    const { data } = response.data
+    try {
+      const response = await axios({
+        method: 'get',
+        baseURL: variables.api_base_url,
+        url: 'api/cms/get-list-province-non-ro',
+        headers: { Authorization: access_token },
+        params: {
+          page,
+          limit: 5,
+          'filter[name]': search,
+        },
+      })
+      const { data } = response.data
 
-    setProvince_options(loadedOptions.concat(data.data))
+      setProvince_options(province_options.concat(data.data))
 
-    return {
-      options: data.data,
-      hasMore: data.last_page > page,
-      additional: {
-        page: page + 1,
-      },
+      return {
+        options: data.data,
+        hasMore: data.last_page > page,
+        additional: {
+          page: page + 1,
+        },
+      }
+    } catch (err) {
+      return {
+        options: [],
+        hasMore: false,
+        additional: {
+          page,
+        },
+      }
     }
   }
 
@@ -103,7 +140,7 @@ function LeadsToConvertDetail() {
 
       const { data } = response.data
 
-      setCity_options(loadedOptions.concat(data.data))
+      setCity_options(city_options.concat(data.data))
 
       return {
         options: data.data,
@@ -144,7 +181,7 @@ function LeadsToConvertDetail() {
 
       const { data } = response.data
 
-      setSubdistrict_options(loadedOptions.concat(data.data))
+      setSubdistrict_options(subdistrict_options.concat(data.data))
 
       return {
         options: data.data,
@@ -199,10 +236,40 @@ function LeadsToConvertDetail() {
       getDataPropspectNonRoByLeads({ customer_id: id }),
       getDataCustomerNonRODetailConvert({ customer_id: id }),
     ]).then(
-      ([dataPropspectNonRoByLeads, dataCustomerNonRODetailConvert]) => {
+      async ([dataPropspectNonRoByLeads, dataCustomerNonRODetailConvert]) => {
         const dataProspect = dataPropspectNonRoByLeads.data
         const dataCustomer = dataCustomerNonRODetailConvert.data
 
+        if (dataCustomer?.data && typeof dataCustomer?.data === 'object') {
+          if (dataCustomer?.data?.['retail_dealer_id']) {
+            const sales = await getSalesOptions('', null, {
+              inititalLoad: true,
+              retail_dealer_id: dataCustomer?.data?.['retail_dealer_id'],
+            })
+            setSales_options([...sales.options])
+          }
+          if (dataCustomer?.data?.['province_id']) {
+            setProvince_options([
+              {
+                id: dataCustomer?.data?.['province_id'],
+                name: dataCustomer?.data?.['province_name'],
+              },
+            ])
+          }
+          if (dataCustomer?.data?.['city_id']) {
+            setCity_options([
+              { id: dataCustomer?.data?.['city_id'], name: dataCustomer?.data?.['city_name'] },
+            ])
+          }
+          if (dataCustomer?.data?.['subdistrict_id']) {
+            setSubdistrict_options([
+              {
+                id: dataCustomer?.data?.['subdistrict_id'],
+                name: dataCustomer?.data?.['subdistrict'],
+              },
+            ])
+          }
+        }
         setDataLeads((prev) => {
           return {
             ...prev,
@@ -229,7 +296,7 @@ function LeadsToConvertDetail() {
     return <>LOADING</>
   }
 
-  console.log('DATA LEADS', dataLeads)
+  // console.log('DATA LEADS', dataLeads)
 
   return (
     <>
@@ -440,15 +507,21 @@ function LeadsToConvertDetail() {
                 <CFormLabel htmlFor="province_id">Provinsi</CFormLabel>
 
                 <SelectAsyncPaginate
-                  value={province_options.filter((o) => o.id === dataLeads?.['province_id'])}
+                  value={province_options.filter(
+                    (o) => String(o.id) === String(dataLeads?.['province_id']),
+                  )}
                   loadOptions={getProvinceOptions}
                   onChange={(selected) => {
                     let tempDataLeads = { ...dataLeads }
                     tempDataLeads['province_id'] = selected?.id
+                    // Reset some values
                     tempDataLeads['city_id'] = ''
                     tempDataLeads['city_name'] = ''
                     tempDataLeads['subdistrict_id'] = ''
                     tempDataLeads['subdistrict'] = ''
+                    setCity_options([])
+                    setSubdistrict_options([])
+                    // Update data on state
                     setDataLeads(tempDataLeads)
                   }}
                   getOptionValue={(option) => option.id}
@@ -463,14 +536,17 @@ function LeadsToConvertDetail() {
                 <CFormLabel htmlFor="city_id">Kota</CFormLabel>
 
                 <SelectAsyncPaginate
-                  value={city_options.filter((o) => o.id === dataLeads?.city_id)}
+                  value={city_options.filter((o) => String(o.id) === String(dataLeads?.city_id))}
                   loadOptions={getCityOptions}
                   onChange={(selected) => {
                     let tempDataLeads = { ...dataLeads }
                     tempDataLeads['city_id'] = selected?.id
                     tempDataLeads['city_name'] = selected?.name
+                    // Reset some values
                     tempDataLeads['subdistrict_id'] = ''
                     tempDataLeads['subdistrict'] = ''
+                    setSubdistrict_options([])
+                    // Update data on state
                     setDataLeads(tempDataLeads)
                   }}
                   getOptionValue={(option) => option.id}
